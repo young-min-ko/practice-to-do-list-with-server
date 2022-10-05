@@ -1,5 +1,6 @@
 const express = require('express');
 const {signUp, logIn, saveToDo, fetchLogIn} = require('../db/index.js');
+const {compareHash} = require('../server/lib/hashUtil.js');
 let app = express();
 
 app.use(express.static(__dirname + '/../client/dist'));
@@ -19,7 +20,7 @@ app.get('/saved', (req, res) => {
 // post
 app.post('/signup', (req, res) => {
   let obj = req.body;
-  console.log('signup',obj);
+  console.log('signup');
   return signUp(obj)
   .then((promise)=>{
     res.status(201).send('signup complete');
@@ -30,13 +31,18 @@ app.post('/signup', (req, res) => {
 
 app.post('/login', (req, res) => {
   let obj = req.body;
-  console.log('login',obj);
+  console.log('login');
   return logIn(obj)
   .then((data)=>{
     if (data.length === 0) {
-      res.status(500).send('INVALID INFO');
+      res.status(500).send('INVALID USERNAME');
     } else {
-      res.status(201).send('login success!');
+      if (compareHash(obj.password, data[0].password, data[0].salt)){
+        res.status(201).send('')
+      } else {
+        res.status(500).send('INVALID PASSWORD');
+      }
+
     }
   }).catch((err)=>{
     res.status(500).send(err);

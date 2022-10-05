@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const {createRandom32String, createHash, compareHash} = require('../server/lib/hashUtil.js');
 mongoose.connect('mongodb://localhost/practice');
 
 let somethingSchema = mongoose.Schema({
@@ -9,20 +10,22 @@ let somethingSchema = mongoose.Schema({
 
 let humanSchema = mongoose.Schema({
   username: {type: String, unique: true},
-  password: String
-  // salt: String;
+  password: String,
+  salt: String
 })
 
 let ToDo = mongoose.model('ToDo', somethingSchema);
 let Human = mongoose.model('Human', humanSchema);
 
 let signUp = (obj) => {
+  obj.salt = createRandom32String();
+  obj.password = createHash(obj.password, obj.salt);
   return Human.create(obj);
   // .then(()=>{}).catch((err)=>(err));
 };
 
 let logIn = (obj) => {
-  return Human.find(obj);
+  return Human.find({username: obj.username});
   // .then((data)=>(data)).catch((err)=>(err));
 };
 
