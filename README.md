@@ -10,3 +10,7 @@ instruction:
 1. in terminal type: npm install
 2. in terminal type: npm run server-dev to run the server (localhost:3000 by default)
 3. while editing type: npm run react-dev
+
+dependency that needs to be installed:
+
+MongoDB
